@@ -15,6 +15,8 @@ class CreateSitesTable extends Migration
     {
         Schema::create('sites', function (Blueprint $table) {
             $table->id();
+            $table->string('uri');
+            $table->string('status_code');
             $table->timestamps();
         });
     }
