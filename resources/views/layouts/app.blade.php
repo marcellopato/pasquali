@@ -82,6 +82,7 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js" integrity="sha512-LGXaggshOkD/at6PFNcp2V2unf9LzFq6LE+sChH7ceMTDP0g2kn6Vxwgg7wkPP7AAtX+lmPqPdxB47A0Nz0cMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script>    
         $(document).ready( function () {
@@ -91,9 +92,29 @@
                 serverSide: true,
                 ajax: '{{ route("get.sites") }}',
                 columns: [
-                    { data: 'uri', name: 'uri' },
-                    { data: 'status_code', name: 'status' },
-                    { data: 'created_at', name: 'created_at' },
+                    { data: 'uri', 
+                        fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html("<a href="+oData.uri+" target=\"_blank\">"+oData.uri+"</a>");
+                        }                    
+                    },
+                    { data: 'status_code', 
+                        fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
+                            if(oData.status_code == 200) {
+                                $(nTd).html("<span class='badge badge-pill badge-success'>ok</span>");
+                            }
+                            if(oData.status_code != 200) {
+                                $(nTd).html("<span class='badge badge-pill badge-warning'>not ok</span>");
+                            }
+                        }
+                    },
+                    { data: 'created_at', 
+                    fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
+                            moment.locale('pt-br');
+                            var data = oData.updated_at;
+                            let atualizado = moment(data, 'YYYYMMDD').fromNow();
+                                $(nTd).html(atualizado);
+                        }
+                    },
                 ]
             });
         });
