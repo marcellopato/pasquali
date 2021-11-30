@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Site;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class SiteController extends Controller
@@ -36,7 +37,28 @@ class SiteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'uri' => 'required|url',
+        ]);
+        $ch = curl_init($request->uri);
+        curl_setopt($ch, CURLOPT_HEADER, true);    // we want headers
+        curl_setopt($ch, CURLOPT_NOBODY, true);    // we don't need body
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_TIMEOUT,10);
+        $output = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if($httpcode == 200){
+            $site = new Site();
+            $site->uri = $request->uri;
+            $site->user_id = Auth::user()->id;
+            $site->status_code = $httpcode;
+            $site->save();
+
+            return redirect()->route('home')->with('message', 'Site cadastrado com sucesso!');
+        } 
+            return redirect()->back()->with('message', 'Esse site não existe ou está fora do ar');
+        
     }
 
     /**

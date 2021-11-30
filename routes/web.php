@@ -11,6 +11,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::group(['middleware' => 'auth'], function () {
     //only auth users can
-    Route::get('/sites', [App\Http\Controllers\SiteController::class, 'getSites'])->name('get.sites');
-    Route::get('/site', [App\Http\Controllers\SiteController::class, 'index'])->name('new.site');
+    Route::get('sites', [App\Http\Controllers\SiteController::class, 'getSites'])->name('get.sites');
+    Route::resource('site', App\Http\Controllers\SiteController::class);
 });
