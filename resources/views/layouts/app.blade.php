@@ -9,8 +9,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -18,6 +17,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
 </head>
 <body>
     <div id="app">
@@ -79,5 +79,24 @@
             @yield('content')
         </main>
     </div>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script>    
+        $(document).ready( function () {
+            $.noConflict();
+            $('#myTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: '{{ route("get.sites") }}',
+                columns: [
+                    { data: 'uri', name: 'uri' },
+                    { data: 'status_code', name: 'status' },
+                    { data: 'created_at', name: 'created_at' },
+                ]
+            });
+        });
+    </script>
 </body>
 </html>
