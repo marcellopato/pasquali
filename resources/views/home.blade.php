@@ -5,7 +5,10 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}<a href="{{ route('site.index') }}" class="btn btn-success float-right">Cadastrar novo site</a></div>
+                <div class="card-header">{{ __('Dashboard') }}
+                    <a href="{{ route('site.index') }}" class="btn btn-success float-right">Cadastrar novo site</a>
+                    <a class="btn btn-primary float-right" id="reload">Checar sites</a>
+                </div>
 
                 <div class="card-body">
                     @if (session('status'))
@@ -36,10 +39,11 @@
 <script>    
         $(document).ready( function () {
             $.noConflict();
-            $('#myTable').DataTable({
+            var route = '{{ route("get.sites") }}';
+            var table = $('#myTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route("get.sites") }}',
+                ajax: route,
                 columns: [
                     { data: 'uri', 
                         fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
@@ -71,6 +75,24 @@
                     }
                 ]
             });
+            table
+                .order( [ 2, 'desc' ] )
+                .draw();
+            
+            $("#reload").click(function(){
+                $.ajax({
+                    type: "GET",
+                    url: '{{ route("check.sites") }}', 
+                    success: function(result){
+                        if (result == 1) 
+                            console.log('atualizou')
+                            table.ajax.reload()
+                    }});
+            });
+            setInterval(function () {
+                $('#reload').trigger('click')
+                table.ajax.reload(route);
+            }, 60000);
         });
     </script>
 @endsection

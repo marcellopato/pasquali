@@ -16,7 +16,7 @@
                             </div>
                         @endif
                         <div class="mb-3">
-                            <label for="uri" class="form-label">URI (http://www.url.com)</label>
+                            <label for="uri" class="form-label">URI <span class="text-muted">(https://www.url.com)</span></label>
                             <input type="text" class="form-control" id="uri" name="uri" value="{{ old('uri') }}">
                                 @error('uri')
                                     <span class="text-danger">{{ $message }}</span>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Site;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -29,6 +30,18 @@ class SiteController extends Controller
         //
     }
 
+    public function testURI($uri)
+    {
+        $ch = curl_init($uri);
+        curl_setopt($ch, CURLOPT_HEADER, true);    // we want headers
+        curl_setopt($ch, CURLOPT_NOBODY, true);    // we don't need body
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_TIMEOUT,10);
+        $output = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        return $httpcode;
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -40,14 +53,7 @@ class SiteController extends Controller
         $validate = $request->validate([
             'uri' => 'required|url',
         ]);
-        $ch = curl_init($request->uri);
-        curl_setopt($ch, CURLOPT_HEADER, true);    // we want headers
-        curl_setopt($ch, CURLOPT_NOBODY, true);    // we don't need body
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-        curl_setopt($ch, CURLOPT_TIMEOUT,10);
-        $output = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        $httpcode =  $this->testURI($request->uri);
         if($httpcode == 200){
             $site = new Site();
             $site->uri = $request->uri;
@@ -114,5 +120,20 @@ class SiteController extends Controller
     public function getSites()
     {
         return DataTables::of(Site::query())->make(true);
+    }
+
+    public function checkSites()
+    {
+        $user = User::where('id', '=', Auth::user()->id)->first();
+        $sites = Site::where('user_id', '=', $user->id)->get();
+        foreach($sites as $site) {
+            $httpcode = $this->testURI($site->uri);
+            if ($httpcode == 200){
+                $siteTested = Site::where('uri', '=', $site->uri)->first();
+                $siteTested->status_code = $site->status_code;
+                $siteTested->update();
+            } 
+            return 1;
+        }
     }
 }

@@ -25,7 +25,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $sites = Site::where('user_id', '=', Auth::user()->id)->paginate(50);
+        $sites = Site::where('user_id', '=', Auth::user()->id)
+            ->orderBy('created_at', 'DESC')
+            ->get();
         return view('home', compact('sites'));
     }
 }
