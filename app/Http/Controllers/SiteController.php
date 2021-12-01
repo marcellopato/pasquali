@@ -69,7 +69,7 @@ class SiteController extends Controller
      */
     public function show($id)
     {
-        //
+        return 'show';
     }
 
     /**
@@ -80,7 +80,8 @@ class SiteController extends Controller
      */
     public function edit($id)
     {
-        //
+        $site = Site::where('id',$id)->first();
+        return view('site.edit')->with('site', $site);
     }
 
     /**
@@ -92,7 +93,10 @@ class SiteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $site = Site::where('id',$id)->first();
+        $site->uri = $request->uri;
+        $site->update();
+        return redirect()->route('home')->with('message', 'Site atualizado com sucesso!');
     }
 
     /**
@@ -103,7 +107,8 @@ class SiteController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Site::where('id',$id)->delete();
+        return redirect()->route('home')->with('message', 'Site apagado com sucesso!');
     }
 
     public function getSites()
