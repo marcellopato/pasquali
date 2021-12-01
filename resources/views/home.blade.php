@@ -91,7 +91,6 @@
             });
             setInterval(function () {
                 $('#reload').trigger('click')
-                table.ajax.reload(route);
             }, 60000);
         });
     </script>
